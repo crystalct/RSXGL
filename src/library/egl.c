@@ -32,6 +32,9 @@
 
 #endif
 
+#define DO_EXPAND(VAL)  VAL ## 555
+#define EXPAND(VAL)     DO_EXPAND(VAL)
+
 static EGLint rsxegl_error = EGL_SUCCESS;
 static int rsxegl_initialized = 0;
 
