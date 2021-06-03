@@ -49,8 +49,8 @@ set_union2(_InputIterator1 __first1, _InputIterator1 __last1,
 	}
     }
 
-  std::for_each(__first1,__last1,boost::bind(&_Visitor::first,&__visitor,_1));
-  std::for_each(__first2,__last2,boost::bind(&_Visitor::second,&__visitor,_1));
+  std::for_each(__first1,__last1,boost::bind(&_Visitor::first,&__visitor,std::placeholders::_1));
+  std::for_each(__first2,__last2,boost::bind(&_Visitor::second,&__visitor,std::placeholders::_1));
 }
 
 template<typename _InputIterator1, typename _InputIterator2,
@@ -148,8 +148,8 @@ set_symmetric_difference2(_InputIterator1 __first1, _InputIterator1 __last1,
       }
   }
   
-  std::for_each(__first1,__last1,boost::bind(&_Visitor::first,&__visitor,_1));
-  std::for_each(__first2,__last2,boost::bind(&_Visitor::second,&__visitor,_1));
+  std::for_each(__first1,__last1,boost::bind(&_Visitor::first,&__visitor,std::placeholders::_1));
+  std::for_each(__first2,__last2,boost::bind(&_Visitor::second,&__visitor,std::placeholders::_1));
 }
 
 #endif

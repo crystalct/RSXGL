@@ -134,6 +134,21 @@ fi
 AC_SUBST([RSXGL_CONFIG_samples_host_ip])
 AC_SUBST([RSXGL_CONFIG_samples_host_port])
 
+AC_SUBST([RSXGL_CONFIG_samples_host_ip])
+AC_SUBST([RSXGL_CONFIG_samples_host_port])
+
+#Set old PSL1GHT version (pre July 2020)
+#There was an api breakage on 2020-07-10, if the version of target PSL1GHT environment is earlier than that date then set PSL1GHT_OLDER_THAN_JULY_2020
+AC_ARG_VAR([PSL1GHT_OLDER_THAN_JULY_2020],[Is version of target PSL1GHT earlier than 2020-07-10? (default is 0])
+
+if test -z "${PSL1GHT_OLDER_THAN_JULY_2020}" == "1"; then
+PSL1GHT_OLDER_THAN_JULY_2020=1
+else
+PSL1GHT_OLDER_THAN_JULY_2020=0
+fi
+
+AC_SUBST([PSL1GHT_OLDER_THAN_JULY_2020])
+
 # Set the default value of NV40ASM, passed to nv40c:
 NV40ASM="\${bindir}/nv40asm"
 AC_SUBST([NV40ASM])

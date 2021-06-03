@@ -18,6 +18,9 @@ rsxglgears_elf_CPPFLAGS = -D__RSX__ -I\$(top_srcdir)/include $(eigen_CPPFLAGS) $
 rsxglgears_elf_CFLAGS = -std=gnu99 -fgnu89-inline -O3
 rsxglgears_elf_LDFLAGS = -L$(top_builddir)/src/library $(PSL1GHT_LDFLAGS)
 rsxglgears_elf_LDADD = -lGL -lEGL -lrsx -lgcm_sys -lnet -lio -lsysutil -lsysmodule -lrt -llv2
+CXXFLAGS += -std=c++11
+
+EXEEXT			:=
 
 TITLE           :=      RSXGLGEARS
 APPID           :=      TSTRSXGL1

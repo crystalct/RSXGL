@@ -67,6 +67,10 @@ os_log_message(const char *message)
 const char *
 os_get_option(const char *name)
 {
+#ifdef RSXGL
+	return NULL;
+#else
    return getenv(name);
+#endif
 }
 

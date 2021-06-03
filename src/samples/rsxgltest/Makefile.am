@@ -87,6 +87,9 @@ rsxgltest_elf_CPPFLAGS = -D__RSX__ -I\$(top_srcdir)/include $(eigen_CPPFLAGS) $(
 rsxgltest_elf_CFLAGS = -std=gnu99 -fgnu89-inline -O3
 rsxgltest_elf_LDFLAGS = -L$(top_builddir)/src/library $(PSL1GHT_LDFLAGS) @ppu_libpng_LDFLAGS@ @ppu_zlib_LDFLAGS@
 rsxgltest_elf_LDADD = $(objects) -lGL -lEGL -lrsx -lgcm_sys -lnet -lio -lsysutil -lsysmodule -lrt -llv2 @ppu_libpng_LIBS@ @ppu_zlib_LIBS@
+CXXFLAGS += -std=c++11
+
+EXEEXT			:=
 
 TITLE           :=      RSXGL Test
 APPID           :=      TSTRSXGL0
