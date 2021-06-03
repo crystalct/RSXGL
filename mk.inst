@@ -1,0 +1,37 @@
+#---------------------------------------------------------------------------------
+# Clear the implicit built in rules
+#---------------------------------------------------------------------------------
+.SUFFIXES:
+#---------------------------------------------------------------------------------
+
+ifeq ($(strip $(PSL1GHT)),)
+$(error "Please set PSL1GHT in your environment. export PSL1GHT=<path>")
+endif
+
+include	$(PSL1GHT)/ppu_rules
+
+.PHONY:
+
+all:
+	@echo Instal RSXGL Libraries
+	cp -rf include/KHR $(PORTLIBS)/include
+	cp -rf include/EGL $(PORTLIBS)/include
+	cp -rf include/GL3 $(PORTLIBS)/include
+	cp -f src/library/GL3/*.h $(PORTLIBS)/include/GL3
+	cp -f src/library/libGL.a $(PORTLIBS)/lib
+	cp -f src/library/libEGL.a $(PORTLIBS)/lib
+	@echo You need nv40asm and nv40c command line program.
+	@echo They are important to compile vertex and fragment,
+	@echo To compile a Cg vertex program:
+	@echo "cgc -profile vp40 program.vcg | nv40asm -v > program.vpo"
+	@echo To compile a Cg fragment program:
+	@echo "cgc -profile fp40 program.fcg | nv40asm -f > program.fpo"
+	@echo To compile a GLSL vertex program:
+	@echo "cgc -oglsl -profile vp40 program.vert | nv40asm -v > program.vpo"
+	@echo To compile a GLSL fragment program:
+	@echo "cgc -oglsl -profile fp40 program.frag | nv40asm -f > program.fpo"
+	@echo
+	@echo Tiring to compile nv40asm and nv40c for your system....
+	make -C src/cgcomp
+	cp src/cgcomp/nv40asm $(PS3DEV)/bin
+	cp src/cgcomp/nv40c $(PS3DEV)/bin

@@ -9,6 +9,22 @@ doesn't arbitrate access to the RSX).
 Please see the STATUS file for up-to-date information about the
 current capabilities of this library.
 
+## RSXGL - Update June 2021 by CrystalCT
+The sources still cannot be compiled with gcc 7.2, so they are compiled using
+Docker PSL1GHT environment (gcc 4.7) and bynaries are installable using:
+```
+make -f mk.inst
+```
+If your target PSL1GHT SDK is older than July 2020 you have to recompile library before
+`mk.inst`, using `PSL1GHT_OLDER_THAN_JULY_2020` def
+```
+./autogen.sh
+./configure PSL1GHT_OLDER_THAN_JULY_2020=1
+make
+make -f mk.inst
+```
+Includes will be putted inside `$PORTLIBS/include` and libs will be putted inside `$PORTLIBS/lib`
+
 ## Installing
 
 RSXGL uses the GNU autotools for its build system and is distributed
