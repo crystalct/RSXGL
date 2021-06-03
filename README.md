@@ -11,7 +11,7 @@ current capabilities of this library.
 
 ## RSXGL - Update June 2021 by CrystalCT
 The sources still cannot be compiled with gcc 7.2, so they are compiled using
-Docker PSL1GHT environment (gcc 4.7) and bynaries are installable using:
+Docker PSL1GHT environment (gcc 4.7) and bynaries are ready to be installed using:
 ```
 make -f mk.inst
 ```
