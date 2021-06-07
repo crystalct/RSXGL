@@ -19,14 +19,12 @@
 #include <sysmodule/sysmodule.h>
 
 #include <vectormath/cpp/vectormath_aos.h>
-
+#include "rsxgl_config.h"
 #include "nagel_bin.h"
 #include "gradient_png.h"
 
 #include <png.h>
 #include <pngdec/pngdec.h>
-
-#include "rsxgl_config.h"
 #include <rsx/commands.h>
 
 #include "texcube_vert.h"

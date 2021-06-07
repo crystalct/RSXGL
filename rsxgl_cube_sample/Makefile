@@ -82,9 +82,8 @@ FCGFILES	:=	$(foreach dir,$(SHADERS),$(notdir $(wildcard $(dir)/*.frag)))
 VPOFILES	:=	$(VCGFILES:.vert=.vpo)
 FPOFILES	:=	$(FCGFILES:.frag=.fpo)
 
-#VCGHEADERFILES	:=	$(VCGFILES:.vert=_vert.h)
-#FCGHEADERFILES	:=	$(FPOFILES:.frag=_frag.h)
-
+export VPOHFILES	:= $(VCGFILES:.vert=_vert.h)
+export FPOHFILES	:= $(FCGFILES:.frag=_frag.h)
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -97,9 +96,7 @@ endif
 
 export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 					$(addsuffix .o,$(VPOFILES)) \
-					$(VCGFILES:.vert=_vert.h) \
 					$(addsuffix .o,$(FPOFILES)) \
-					$(FPOFILES:.frag=_frag.h) \
 					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 					$(sFILES:.s=.o) $(SFILES:.S=.o)
 
@@ -115,7 +112,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES), -I$(CURDIR)/$(dir)) \
 # build a list of library paths
 #---------------------------------------------------------------------------------
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
-					$(LIBPSL1GHT_LIB) -L-I$(PORTLIBS)/lib
+					$(LIBPSL1GHT_LIB) -L$(PORTLIBS)/lib
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 .PHONY: $(BUILD) clean
@@ -128,7 +125,7 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).self
+	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).self $(OUTPUT).fake.self
 
 #---------------------------------------------------------------------------------
 run:
@@ -145,22 +142,27 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-$(OUTPUT).self: $(OUTPUT).elf
-$(OUTPUT).elf:	$(OFILES)
+#$(OUTPUT).self: $(OUTPUT).elf
+#$(OUTPUT).elf: $(OFILES) 
+all: $(VPOHFILES) $(FPOHFILES) $(OUTPUT).elf $(OUTPUT).self
 
+#$(OUTPUT).self: $(OUTPUT).elf 
 
 %.vpo: %.vert
 	@echo "[Compiling GLSL vertex program] $(notdir $<)"
 	CGC=$(CGC) NV40ASM=$(NV40ASM) $(NV40C) -v -x glsl -o $@ ../$(SHADERS)/$(notdir $<)
+	#cp -f $< $(CURDIR)/
+	#pushd $(CURDIR); rm -f `echo $@ | sed 's/.vpo/_vert.h/'`; $(XXD) -i $(notdir $<) > `echo $@ | sed 's/.vpo/_vert.h/'`; popd
 
 %.fpo: %.frag
 	@echo "[Compiling GLSL fragment program] $(notdir $<)"
 	CGC=$(CGC) NV40ASM=$(NV40ASM) $(NV40C) -f -x glsl -o $@ ../$(SHADERS)/$(notdir $<)
+	#cp -f $< $(CURDIR)/
+	#pushd $(CURDIR); rm -f `echo $@ | sed 's/.fpo/_frag.h/'`; $(XXD) -i $(notdir $<) > `echo $@ | sed 's/.fpo/_frag.h/'`; popd
 
 %_frag.h: %.frag
 	@echo Generating $@ from $<
 	cp -f $< $(CURDIR)/
-	ls -al
 	pushd $(CURDIR); rm -f $@; $(XXD) -i $(notdir $<) > $@; popd
 	mv $@ $(CURDIR)/../include
 	@echo done
@@ -177,28 +179,25 @@ $(OUTPUT).elf:	$(OFILES)
 #---------------------------------------------------------------------------------
 %.bin.o	:	%.bin
 #---------------------------------------------------------------------------------
-	@echo A
 	@echo $(notdir $<)
 	@$(bin2o)
 
 #---------------------------------------------------------------------------------
 %.vpo.o	:	%.vpo
 #---------------------------------------------------------------------------------
-	@echo B
 	echo $(notdir $<)
 	$(bin2o)
 
 #---------------------------------------------------------------------------------
 %.fpo.o	:	%.fpo
 #---------------------------------------------------------------------------------
-	@echo C
 	echo $(notdir $<)
 	$(bin2o)
 
 
 
 
--include $(DEPENDS)
+-include $(DEPENDS) $(DEFENDS_H)
 
 #---------------------------------------------------------------------------------
 endif
