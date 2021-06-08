@@ -48,30 +48,12 @@ const float geometry[] = {
 
 
 GLuint* client_indices = 0;
-f32 rotx = 0.0f;
-f32 roty = 0.0f;
 
-const GLuint indices[] = {
-
-      0,1,2,   0,2,3,   1,4,5,   1,5,2,   4,7,6,	 4,6,5,
-                            7,0,3,   7,3,6,   9,2,5,   9,5,8,   0,10,11,   0,7,10
-};
+const GLuint indices[] = { 0,1,2,  0,2,3,  1,4,5,  1,5,2,  4,7,6,  4,6,5,
+                           7,0,3,  7,3,6,  9,2,5,  9,5,8,  0,10,11,  0,7,10 };
 
 // Test program might want to use these:
-int rsxgltest_width = 0, rsxgltest_height = 0;
-
-static void report_glerror(const char * label)
-{
-  GLenum e = glGetError();
-  if(e != GL_NO_ERROR) {
-    if(label != 0) {
-      printf("%s: %x\n",label,e);
-    }
-    else {
-      printf("%x\n",e);
-    }
-  }
-}
+int rsxglcube_width = 0, rsxglcube_height = 0;
 
 static void
 report_shader_info(GLuint shader)
@@ -154,13 +136,13 @@ summarize_program(const char * label,GLuint program)
     printf("%u attribs, name max length: %u\n",num_attribs,attrib_name_length);
     char szName[attrib_name_length + 1];
 
-    for(size_t i = 0;i < num_attribs;++i) {
+    for(size_t i = 0;i < (unsigned)num_attribs;++i) {
       GLint size = 0;
       GLenum type = 0;
       GLint location = 0;
       glGetActiveAttrib(program,i,attrib_name_length + 1,0,&size,&type,szName);
       location = glGetAttribLocation(program,szName);
-      printf("\t%u: %s %u %u %u\n",i,szName,(unsigned int)location,(unsigned int)size,(unsigned int)type);
+      printf("\t%lu: %s %u %u %u\n",i,szName,(unsigned int)location,(unsigned int)size,(unsigned int)type);
     }
   }
 
@@ -172,13 +154,13 @@ summarize_program(const char * label,GLuint program)
     printf("%u uniforms, name max length: %u\n",num_uniforms,uniform_name_length);
     char szName[uniform_name_length + 1];
 
-    for(size_t i = 0;i < num_uniforms;++i) {
+    for(size_t i = 0;i < (unsigned)num_uniforms;++i) {
       GLint size = 0;
       GLenum type = 0;
       GLint location = 0;
       glGetActiveUniform(program,i,uniform_name_length + 1,0,&size,&type,szName);
       location = glGetUniformLocation(program,szName);
-      printf("\t%u: %s %u %u %x\n",i,szName,(unsigned int)location,(unsigned int)size,(unsigned int)type);
+      printf("\t%lu: %s %u %u %x\n",i,szName,(unsigned int)location,(unsigned int)size,(unsigned int)type);
     }
   }
 }
@@ -232,7 +214,7 @@ static void
 cube_init(void)
 {
     printf("%s\n", __PRETTY_FUNCTION__);
-    P = Matrix4::perspective(DTOR(54.3), 1920.0 / 1080.0, 0.1f, 1000.0f);
+    P = Matrix4::perspective(DTOR(54.3), (float)rsxglcube_width / (float)rsxglcube_height, 0.1f, 1000.0f);
     
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -267,10 +249,11 @@ cube_init(void)
     glLinkProgram(program);
 
     glValidateProgram(program);
-
+	
+	report_program_info(program);
+    
     summarize_program("draw", program);
-
-    vertex_location = glGetAttribLocation(program, "vertex");
+	vertex_location = glGetAttribLocation(program, "vertex");
     tc_location = glGetAttribLocation(program, "uv");
 
     ProjMatrix_location = glGetUniformLocation(program, "ProjMatrix");
@@ -333,6 +316,9 @@ cube_init(void)
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	report_shader_info(shaders[0]);
+	report_shader_info(shaders[1]);
 
 }
 
@@ -342,7 +328,7 @@ static void
 draw_cube()
 {
     float rgb[3] = {
-      0.5,00.5,0.5
+      0.5,0.5,0.5
     };
 
     glClearColor(rgb[0], rgb[1], rgb[2], 1.0);
@@ -367,7 +353,6 @@ draw_cube()
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, client_indices);
     }
 
-
 }
 
 
@@ -378,6 +363,10 @@ main()
   printf("%s\n","rsxglcube");
   if (sysModuleLoad(SYSMODULE_PNGDEC) != 0) exit(0);
 
+  padInfo padinfo;
+  padData paddata;
+  ioPadInit(7);
+  
   //glInitDebug(1024*256,tcp_puts);
 
   EGLDisplay dpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
@@ -409,10 +398,10 @@ main()
 	EGLSurface surface = eglCreateWindowSurface(dpy,config,0,0);
 	
 	if(surface != EGL_NO_SURFACE) {
-	  eglQuerySurface(dpy,surface,EGL_WIDTH,&rsxgltest_width);
-	  eglQuerySurface(dpy,surface,EGL_HEIGHT,&rsxgltest_height);
+	  eglQuerySurface(dpy,surface,EGL_WIDTH,&rsxglcube_width);
+	  eglQuerySurface(dpy,surface,EGL_HEIGHT,&rsxglcube_height);
 
-	  printf("eglCreateWindowSurface: %ix%i\n",rsxgltest_width,rsxgltest_height);
+	  printf("eglCreateWindowSurface: %ix%i\n",rsxglcube_width,rsxglcube_height);
 	  
 	  EGLContext ctx = eglCreateContext(dpy,config,0,0);
 	  printf("eglCreateContext: %lu\n",(unsigned long)ctx);
@@ -430,25 +419,34 @@ main()
 	      
 	      while(running) {
 		
-		
-		
-		if(drawing) {
-            
-            draw_cube();
-		}
-		
-		result = eglSwapBuffers(dpy,surface);
-		
-		EGLint e = eglGetError();
-		if(!result) {
-		  printf("Swap sync timed-out: %x\n",e);
-		  break;
-		}
-		else {
-		  
-		  
-		  sysUtilCheckCallback();
-		}
+			ioPadGetInfo(&padinfo);
+			
+			for(int i=0; i < MAX_PADS; i++){
+				if(padinfo.status[i]){
+					ioPadGetData(i, &paddata);
+					
+					if(paddata.BTN_CIRCLE)
+						running = 0;
+				}
+
+			}
+			if(drawing) {
+				
+				draw_cube();
+			}
+			
+			result = eglSwapBuffers(dpy,surface);
+			
+			EGLint e = eglGetError();
+			if(!result) {
+			  printf("Swap sync timed-out: %x\n",e);
+			  break;
+			}
+			else {
+			  
+			  
+			  sysUtilCheckCallback();
+			}
 	      }
 	    
           //EXIT HERE

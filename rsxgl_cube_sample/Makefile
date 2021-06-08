@@ -142,37 +142,25 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-#$(OUTPUT).self: $(OUTPUT).elf
-#$(OUTPUT).elf: $(OFILES) 
-all: $(VPOHFILES) $(FPOHFILES) $(OUTPUT).elf $(OUTPUT).self
-
-#$(OUTPUT).self: $(OUTPUT).elf 
+all: $(VPOHFILES) $(FPOHFILES) $(OFILES) $(OUTPUT).elf $(OUTPUT).self
 
 %.vpo: %.vert
 	@echo "[Compiling GLSL vertex program] $(notdir $<)"
-	CGC=$(CGC) NV40ASM=$(NV40ASM) $(NV40C) -v -x glsl -o $@ ../$(SHADERS)/$(notdir $<)
-	#cp -f $< $(CURDIR)/
-	#pushd $(CURDIR); rm -f `echo $@ | sed 's/.vpo/_vert.h/'`; $(XXD) -i $(notdir $<) > `echo $@ | sed 's/.vpo/_vert.h/'`; popd
+	@CGC=$(CGC) NV40ASM=$(NV40ASM) $(NV40C) -v -x glsl -o $@ ../$(SHADERS)/$(notdir $<)
 
 %.fpo: %.frag
 	@echo "[Compiling GLSL fragment program] $(notdir $<)"
-	CGC=$(CGC) NV40ASM=$(NV40ASM) $(NV40C) -f -x glsl -o $@ ../$(SHADERS)/$(notdir $<)
-	#cp -f $< $(CURDIR)/
-	#pushd $(CURDIR); rm -f `echo $@ | sed 's/.fpo/_frag.h/'`; $(XXD) -i $(notdir $<) > `echo $@ | sed 's/.fpo/_frag.h/'`; popd
+	@CGC=$(CGC) NV40ASM=$(NV40ASM) $(NV40C) -f -x glsl -o $@ ../$(SHADERS)/$(notdir $<)
 
 %_frag.h: %.frag
 	@echo Generating $@ from $<
-	cp -f $< $(CURDIR)/
-	pushd $(CURDIR); rm -f $@; $(XXD) -i $(notdir $<) > $@; popd
-	mv $@ $(CURDIR)/../include
-	@echo done
+	@cp -f $< $(CURDIR)/
+	@pushd $(CURDIR); rm -f $@; $(XXD) -i $(notdir $<) > $@; popd
 
 %_vert.h: %.vert
 	@echo Generating $@ from $<
-	cp -f $< $(CURDIR)/
-	pushd $(CURDIR); rm -f $@; $(XXD) -i $(notdir $<) > $@; popd
-	mv $@ $(CURDIR)/../include
-	@echo done
+	@cp -f $< $(CURDIR)/
+	@pushd $(CURDIR); rm -f $@; $(XXD) -i $(notdir $<) > $@; popd
 
 #---------------------------------------------------------------------------------
 # This rule links in binary data with the .bin extension
@@ -186,18 +174,16 @@ all: $(VPOHFILES) $(FPOHFILES) $(OUTPUT).elf $(OUTPUT).self
 %.vpo.o	:	%.vpo
 #---------------------------------------------------------------------------------
 	echo $(notdir $<)
-	$(bin2o)
+	@$(bin2o)
 
 #---------------------------------------------------------------------------------
 %.fpo.o	:	%.fpo
 #---------------------------------------------------------------------------------
-	echo $(notdir $<)
-	$(bin2o)
+	@echo $(notdir $<)
+	@$(bin2o)
 
 
-
-
--include $(DEPENDS) $(DEFENDS_H)
+-include $(DEPENDS)
 
 #---------------------------------------------------------------------------------
 endif
